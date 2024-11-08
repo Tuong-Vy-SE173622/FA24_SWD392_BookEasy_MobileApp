@@ -1,5 +1,8 @@
-import 'package:bookeasy/pages/login.dart';
-import 'package:bookeasy/pages/splash.dart';
+import 'package:bookeasy/views/event_group_guest.dart';
+import 'package:bookeasy/views/event_guest.dart';
+import 'package:bookeasy/views/home.dart';
+import 'package:bookeasy/views/login.dart';
+import 'package:bookeasy/views/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,7 +13,7 @@ class AppRouter {
       routes: <RouteBase>[
         GoRoute(
           path: '/',
-          name: 'incon page',
+          name: 'Splash Page',
           builder: (context, state) {
             return SplashScreen();
           },
@@ -20,37 +23,31 @@ class AppRouter {
           name: 'Login Page',
           builder: (context, state) => LoginScreen(),
         ),
-        // ShellRoute(
-        //   routes: [
-        //     GoRoute(
-        //       path: '/home',
-        //       name: 'Home Page',
-        //       builder: (context, state) => Container(
-        //         child: Center(
-        //           child: Text('Home page'),
-        //         ),
-        //       ),
-        //     )
-        //   ],
-        //   builder: (context, state, child) => NavigationBar(
-        //     destinations: [
-        //       NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-        //       NavigationDestination(icon: Icon(Icons.person), label: 'Account'),
-        //       NavigationDestination(
-        //           icon: Icon(Icons.settings), label: 'Setting')
-        //     ],
-        //     backgroundColor: const Color.fromARGB(255, 5, 117, 230),
-        //     // selectedIndex: currentPageIndex,
-        //   ),
-        // )
         ShellRoute(
           routes: [
             GoRoute(
               path: '/home',
               name: 'Home Page',
-              builder: (context, state) => const Center(
-                child: Text('Home page'),
-              ),
+              builder: (context, state) => HomePage(),
+            ),
+            GoRoute(
+              path: '/event/:eventID',
+              name: 'Event Page',
+              builder: (context, state) {
+                final eventID = int.parse(state.pathParameters['eventID']!);
+                final eventName =
+                    'Event Name'; // Placeholder for actual event name
+                return EventGroupGuestPage(
+                    eventID: eventID, eventName: eventName);
+              },
+            ),
+            GoRoute(
+              path: '/guest/:guestGroupID',
+              builder: (BuildContext context, GoRouterState state) {
+                final guestGroupID =
+                    int.parse(state.pathParameters['guestGroupID']!);
+                return GuestListPage(guestGroupID: guestGroupID);
+              },
             ),
             GoRoute(
               path: '/account',
@@ -68,23 +65,24 @@ class AppRouter {
             ),
           ],
           builder: (context, state, child) {
-            int currentPageIndex = state.uri.toString() == '/home'
-                ? 0
-                : state.uri.toString() == '/account'
-                    ? 1
-                    : 2;
+            // Determine the current index based on the current URI path
+            int currentPageIndex = 0;
+            switch (state.uri.path) {
+              case '/home':
+                currentPageIndex = 0;
+                break;
+              case '/account':
+                currentPageIndex = 1;
+                break;
+              case '/settings':
+                currentPageIndex = 2;
+                break;
+              default:
+                currentPageIndex = 0; // Default to Home if path is unrecognized
+            }
 
             return Scaffold(
-              body:
-                  // Column(
-                  //   children: [
-                  //     Expanded(child: child), // Đẩy nội dung lên trên
-                  //   ],
-                  // ),
-                  Container(
-                child: Expanded(child: child),
-                color: Color.fromARGB(255, 5, 117, 230),
-              ),
+              body: child,
               bottomNavigationBar: NavigationBar(
                 selectedIndex: currentPageIndex,
                 onDestinationSelected: (index) {
@@ -108,7 +106,7 @@ class AppRouter {
                       icon: Icon(Icons.settings), label: 'Setting'),
                 ],
                 backgroundColor: Colors.white,
-                // animationDuration: Duration(microseconds: 1000),
+                indicatorColor: Color.fromARGB(255, 145, 200, 255),
                 height: 100,
               ),
             );
