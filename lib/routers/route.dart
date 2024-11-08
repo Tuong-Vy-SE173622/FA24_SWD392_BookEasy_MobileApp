@@ -2,14 +2,16 @@ import 'package:bookeasy/views/event_group_guest.dart';
 import 'package:bookeasy/views/event_guest.dart';
 import 'package:bookeasy/views/home.dart';
 import 'package:bookeasy/views/login.dart';
+import 'package:bookeasy/views/setting.dart';
 import 'package:bookeasy/views/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
-  static GoRouter goRouter() {
+  static GoRouter goRouter(GlobalKey<NavigatorState> navigatorKey) {
     return GoRouter(
       initialLocation: '/',
+      navigatorKey: navigatorKey,
       routes: <RouteBase>[
         GoRoute(
           path: '/',
@@ -57,12 +59,9 @@ class AppRouter {
               ),
             ),
             GoRoute(
-              path: '/settings',
-              name: 'Settings Page',
-              builder: (context, state) => const Center(
-                child: Text('Settings page'),
-              ),
-            ),
+                path: '/settings',
+                name: 'Settings Page',
+                builder: (context, state) => SettingPage()),
           ],
           builder: (context, state, child) {
             // Determine the current index based on the current URI path
