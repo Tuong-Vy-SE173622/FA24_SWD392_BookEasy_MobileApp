@@ -16,7 +16,7 @@ class GuestListPage extends StatefulWidget {
 
 class _GuestListPageState extends State<GuestListPage> {
   late Future<List<Guest>> _guestsFuture;
-  late int eventID = widget.guestGroupID;
+  late int eventID = widget.eventID;
 
   @override
   void initState() {
