@@ -1,51 +1,91 @@
+// import 'package:flutter/material.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+
+// class SettingPage extends StatelessWidget {
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(
+//           'Setting',
+//           style: TextStyle(
+//               color: Colors.blueAccent,
+//               fontWeight: FontWeight.bold,
+//               fontSize: 27),
+//         ),
+//         centerTitle: true,
+//         backgroundColor: Colors.white,
+//       ),
+//       body: ,
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bookeasy/services/auth_service.dart'; // Import AuthService
+import 'package:go_router/go_router.dart'; // For navigation
 
 class SettingPage extends StatelessWidget {
-  Future<Map<String, dynamic>> _getAllStoredData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map<String, dynamic> allData = {};
+  // Create an instance of AuthService to handle the logout
+  final AuthService _authService = AuthService();
 
-    // Duyệt tất cả các key trong SharedPreferences
-    final keys = prefs.getKeys();
-    for (var key in keys) {
-      final value = prefs.get(key);
-      allData[key] = value;
+  Future<void> _logout(BuildContext context) async {
+    try {
+      await _authService.logout();
+      // After logout, navigate to the login page
+      context.go('/login');
+    } catch (e) {
+      // Handle any error that occurs during logout
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logout failed: $e')),
+      );
     }
-
-    return allData;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text(
+          'Setting',
+          style: TextStyle(
+            color: Colors.blueAccent,
+            fontWeight: FontWeight.bold,
+            fontSize: 27,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _getAllStoredData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No data found in SharedPreferences.'));
-          } else {
-            final data = snapshot.data!;
-            return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                String key = data.keys.elementAt(index);
-                var value = data[key];
-                return ListTile(
-                  title: Text(key),
-                  subtitle: Text(value.toString()),
-                );
-              },
-            );
-          }
-        },
+      body: Container(
+        color: Color.fromARGB(255, 145, 200, 255),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Other settings options can be added here
+
+              // Logout Button
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => _logout(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors
+                        .blueAccent, // Set the button color to red for Logout
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

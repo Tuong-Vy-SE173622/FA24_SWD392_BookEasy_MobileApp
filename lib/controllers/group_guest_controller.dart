@@ -7,33 +7,6 @@ class GroupGuestController {
   final String apiUrl =
       'https://eventcheckinmanagement-h7bggygec8esg5cd.southeastasia-01.azurewebsites.net/api/guestgroup/event/';
 
-  // Lấy dữ liệu guest group từ API
-//   Future<List<GroupGuest>> fetchGroupGuests(int eventID) async {
-//     print("EventID: $eventID");
-//     print('$apiUrl$eventID/guest-groups');
-//     try {
-//       final response = await http.get(
-//         Uri.parse('$apiUrl$eventID/guest-groups'),
-//         headers: {
-//           'accept': 'text/plain',
-//           // 'Authorization': 'Bearer $token', // Dùng token nếu không null
-//         },
-//       );
-
-//       if (response.statusCode == 200) {
-//         final Map<String, dynamic> jsonResponse = json.decode(response.body);
-//         final List<dynamic> data = jsonResponse['\$values'];
-//         // Chuyển đổi dữ liệu thành danh sách các GroupGuest
-//         return data.map((item) => GroupGuest.fromJson(item)).toList();
-//       } else {
-//         throw Exception("Lỗi khi tải dữ liệu: ${response.statusCode}");
-//       }
-//     } catch (e) {
-//       throw Exception("Không thể kết nối với API: $e");
-//     }
-//   }
-// }
-
   Future<List<GroupGuest>> fetchGroupGuests(int eventID) async {
     print("EventID: $eventID");
     final url = '$apiUrl$eventID/guest-groups';
@@ -63,7 +36,7 @@ class GroupGuestController {
 
         // Kiểm tra dữ liệu trống
         if (data.isEmpty) {
-          throw Exception("Không có dữ liệu guest group");
+          throw Exception("Không có Guest trong Group này");
         }
 
         // Chuyển đổi dữ liệu thành danh sách các GroupGuest

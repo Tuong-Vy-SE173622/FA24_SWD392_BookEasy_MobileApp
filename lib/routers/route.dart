@@ -1,5 +1,6 @@
 // import 'package:bookeasy/views/event_group_guest.dart';
 // import 'package:bookeasy/views/event_guest.dart';
+import 'package:bookeasy/views/account.dart';
 import 'package:bookeasy/views/event_group_guest.dart';
 import 'package:bookeasy/views/event_guest.dart';
 import 'package:bookeasy/views/home.dart';
@@ -64,9 +65,7 @@ class AppRouter {
             GoRoute(
               path: '/account',
               name: 'Account Page',
-              builder: (context, state) => const Center(
-                child: Text('Account page'),
-              ),
+              builder: (context, state) => AccountPage(),
             ),
             GoRoute(
                 path: '/settings',

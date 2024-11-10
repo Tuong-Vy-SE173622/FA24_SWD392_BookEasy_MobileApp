@@ -20,8 +20,13 @@ class EventController {
 
     if (response.statusCode == 200) {
       // final List<dynamic> data = json.decode(response.body)['$values'];
+
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       final List<dynamic> data = jsonResponse['\$values'];
+
+      if (data.isEmpty) {
+        throw Exception("Không có Group Guest nào trong Event này");
+      }
       return data.map((json) => Event.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load events');
