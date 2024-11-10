@@ -1,3 +1,5 @@
+// import 'package:bookeasy/views/event_group_guest.dart';
+// import 'package:bookeasy/views/event_guest.dart';
 import 'package:bookeasy/views/event_group_guest.dart';
 import 'package:bookeasy/views/event_guest.dart';
 import 'package:bookeasy/views/home.dart';
@@ -30,7 +32,10 @@ class AppRouter {
             GoRoute(
               path: '/home',
               name: 'Home Page',
-              builder: (context, state) => HomePage(),
+              builder: (context, state) {
+                // final currentLocation = state.namedLocation(name);
+                return HomePage();
+              },
             ),
             GoRoute(
               path: '/event/:eventID',
@@ -48,7 +53,12 @@ class AppRouter {
               builder: (BuildContext context, GoRouterState state) {
                 final guestGroupID =
                     int.parse(state.pathParameters['guestGroupID']!);
-                return GuestListPage(guestGroupID: guestGroupID);
+                // final eventID = int.parse(state.queryParameters['eventID']!);
+                final uri = Uri.parse(state.uri.toString());
+                final eventID = int.parse(uri.queryParameters['eventID']!);
+                // final currentLocation = state.uri.toString();
+                return GuestListPage(
+                    guestGroupID: guestGroupID, eventID: eventID);
               },
             ),
             GoRoute(

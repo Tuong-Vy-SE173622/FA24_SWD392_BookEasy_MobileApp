@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:bookeasy/controllers/group_guest_controller.dart';
 import 'package:bookeasy/models/group_guest.dart';
 import 'package:go_router/go_router.dart';
 
-class EventGroupGuestPage extends StatelessWidget {
+class EventGroupGuestPage extends StatefulWidget {
   final int eventID;
   final String eventName;
 
   EventGroupGuestPage({required this.eventID, required this.eventName});
 
   @override
-  Widget build(BuildContext context) {
-    final groupGuests = generateSampleGroupGuests(eventID, eventName);
+  _EventGroupGuestPageState createState() => _EventGroupGuestPageState();
+}
 
+class _EventGroupGuestPageState extends State<EventGroupGuestPage> {
+  late Future<List<GroupGuest>> _groupGuests;
+  final GroupGuestController _controller = GroupGuestController();
+
+  @override
+  void initState() {
+    super.initState();
+    print("EventID passed: ${widget.eventID}");
+    _groupGuests = _controller.fetchGroupGuests(widget.eventID);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Event',
+          widget.eventName,
           style: TextStyle(
               color: Colors.blueAccent,
               fontWeight: FontWeight.bold,
@@ -33,19 +47,20 @@ class EventGroupGuestPage extends StatelessWidget {
       body: Container(
         color: Color.fromARGB(255, 145, 200, 255),
         padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Text(
-            //   eventName,
-            //   style: TextStyle(
-            //     fontSize: 24,
-            //     fontWeight: FontWeight.bold,
-            //   ),
-            // ),
-            // SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
+        child: FutureBuilder<List<GroupGuest>>(
+          future: _groupGuests,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              print(
+                  "Error fetching group guests: ${snapshot.error}"); // Debugging
+              return Center(child: Text("Đã xảy ra lỗi: ${snapshot.error}"));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text("Không có nhóm khách nào"));
+            } else {
+              final groupGuests = snapshot.data!;
+              return ListView.builder(
                 itemCount: groupGuests.length,
                 itemBuilder: (context, index) {
                   final groupGuest = groupGuests[index];
@@ -60,15 +75,12 @@ class EventGroupGuestPage extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
-                          // Thêm biểu tượng tổ chức
                           Icon(
                             Icons.apartment,
                             size: 40,
                             color: Colors.blueAccent,
                           ),
-                          SizedBox(
-                              width:
-                                  16), // Khoảng cách giữa biểu tượng và thông tin
+                          SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,22 +88,24 @@ class EventGroupGuestPage extends StatelessWidget {
                                 Text(
                                   groupGuest.name,
                                   style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blueAccent,
-                                  ),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blueAccent),
                                 ),
-                                SizedBox(height: 8),
+                                SizedBox(height: 4),
                                 Row(
                                   children: [
                                     Icon(Icons.business,
                                         size: 16, color: Colors.grey),
                                     SizedBox(width: 4),
-                                    Text(
-                                      groupGuest.organizationName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black87,
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          groupGuest.organizationName,
+                                          style: TextStyle(
+                                              fontSize: 15, color: Colors.grey),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -101,33 +115,28 @@ class EventGroupGuestPage extends StatelessWidget {
                                     Icon(Icons.label,
                                         size: 16, color: Colors.grey),
                                     SizedBox(width: 4),
-                                    Text(
-                                      groupGuest.type,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
+                                    Text(groupGuest.type,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black54)),
                                   ],
                                 ),
                               ],
                             ),
                           ),
-                          // Nút chi tiết
                           ElevatedButton(
                             onPressed: () {
-                              // Chuyển trang với guestGroupID
-                              context.go('/guest/${groupGuest.guestGroupID}');
+                              // context.go(
+                              //     '/guest/${groupGuest.guestGroupID}?eventID=${widget.eventID}');
+                              context.go(
+                                  '/guest/${groupGuest.guestGroupID}?eventID=${widget.eventID}');
                             },
-                            child: Text(
-                              'Details',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            child: Text('Details',
+                                style: TextStyle(color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                                  borderRadius: BorderRadius.circular(8)),
                             ),
                           ),
                         ],
@@ -135,9 +144,9 @@ class EventGroupGuestPage extends StatelessWidget {
                     ),
                   );
                 },
-              ),
-            ),
-          ],
+              );
+            }
+          },
         ),
       ),
     );
